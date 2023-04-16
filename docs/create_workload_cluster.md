@@ -11,16 +11,16 @@
 4. Reserve a new Control Plane endpoint IP for your Kubernetes cluster.
    
     ```bash
-    export TEST_CLUSTER_NAME=mycluster
-    export TEST_NAMESPACE=mynamespace
+    export WORKLOAD_CLUSTER_NAME=mycluster
+    export AUTOSCALER_NS=mynamespace
     ```
 
 5. Generate your kubernetes clusters configuration file
 
     ```bash
-    CONTROL_PLANE_ENDPOINT_IP=x.x.x.x clusterctl generate cluster ${TEST_CLUSTER_NAME} --flavor ccm \
+    CONTROL_PLANE_ENDPOINT_IP=x.x.x.x clusterctl generate cluster ${WORKLOAD_CLUSTER_NAME} --flavor ccm \
     -i nutanix \
-    --target-namespace ${TEST_NAMESPACE}  \
+    --target-namespace ${AUTOSCALER_NS}  \
     --kubernetes-version v1.24.11 \
     --control-plane-machine-count 1 \
     --worker-machine-count 3 > ./cluster.yaml
@@ -29,7 +29,7 @@
 7. Create a namespace in the management cluster where the workload cluster can be managed
 
     ```bash
-    kubectl create ns ${TEST_NAMESPACE}
+    kubectl create ns ${AUTOSCALER_NS}
     ```
 
 8.  Apply the ``cluster.yaml`` manifest to create your workload cluster in the Nutanix infrastructure
@@ -59,14 +59,14 @@
 10. Download the kubeconfig for workload cluster by running the following command
     
     ```bash
-    clusterctl get kubeconfig ${TEST_CLUSTER_NAME} -n ${TEST_NAMESPACE} > ${TEST_CLUSTER_NAME}.kubeconfig
-    kubectl --kubeconfig ./${TEST_CLUSTER_NAME}.kubeconfig get nodes
+    clusterctl get kubeconfig ${WORKLOAD_CLUSTER_NAME} -n ${AUTOSCALER_NS} > ${WORKLOAD_CLUSTER_NAME}.kubeconfig
+    kubectl --kubeconfig ./${WORKLOAD_CLUSTER_NAME}.kubeconfig get nodes
     ``` 
 
 11. Watch the nodes in the cluster until all the nodes come up (1 control plane and 3 workers unless you modified the ``clusterctl.yaml`` file)
    
     ```bash
-    kubectl --kubeconfig ./${TEST_CLUSTER_NAME}.kubeconfig get nodes -w
+    kubectl --kubeconfig ./${WORKLOAD_CLUSTER_NAME}.kubeconfig get nodes -w
     ```
 
 12. Once the desired number of nodes are present, you will see that these will be in a ``NotReady`` state. 
@@ -87,7 +87,7 @@
 13. Run the following command to install [Calico CNI](https://cluster-api.sigs.k8s.io/user/quick-start.html?highlight=cni#deploy-a-cni-solution).
    
      ```bash
-     kubectl --kubeconfig ./${TEST_CLUSTER_NAME}.kubeconfig apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/calico.yaml
+     kubectl --kubeconfig ./${WORKLOAD_CLUSTER_NAME}.kubeconfig apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/calico.yaml
      ```
 
 14. Upon successful install of CNI, the nodes will get to a ``READY`` state. (it might take a minute or two depending on the resources available to your VMs)
@@ -95,7 +95,7 @@
 15. Confirm the state of your workload Kubernetes cluster
     
      ```bash
-     kubectl --kubeconfig ./${TEST_CLUSTER_NAME}.kubeconfig get nodes
+     kubectl --kubeconfig ./${WORKLOAD_CLUSTER_NAME}.kubeconfig get nodes
      ```
      ```bash title="Output"
      NAME                                 STATUS   ROLES           AGE     VERSION

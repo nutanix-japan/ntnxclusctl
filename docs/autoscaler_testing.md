@@ -1,9 +1,9 @@
 # Testing Autoscaling Functionality
 
 !!!warning
-          Autoscaling is not validated feature and intended for production purposes.
+          As of April 2023, Autoscaling is a ``yet to be validated`` feature and it is ``not intended`` for production purposes.
 
-          For updates follow this Nutanix [Opendocs document](https://opendocs.nutanix.com/capx/v1.1.x/experimental/autoscaler/)
+          For updates follow this Nutanix [Opendocs](https://opendocs.nutanix.com/capx/v1.1.x/experimental/autoscaler/) document.
 
 We will run with the following configuration:
 
@@ -13,7 +13,7 @@ We will run with the following configuration:
 
 ``` mermaid
 graph LR
-  B[Management Cluster - AutoScaler ] -->|kubeconfig| C[Workload Cluster - Workloads ];
+  B[Management Cluster - AutoScaler ] -->|"[kubeconfig]"| C[Workload Cluster - Workloads ];
 ```
 
 ## Deploy AutoScaler on Management Cluster
@@ -24,23 +24,19 @@ graph LR
     curl -OL https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/clusterapi/examples/deployment.yaml
     ```
 
-2. Set your environment variables for the following
-   
-    - The namespace on which your workload cluster was deployed
-    - The Autoscaler image you would like to use 
+2. Set your environment variables for the Autoscaler image you would like to use 
    
     ```bash
-    export AUTOSCALER_NS=mynamespace #remember to use your own 
     export AUTOSCALER_IMAGE="us.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler:v1.24.1"
     ```
  
     !!!info
-           Other Autoscaler images can be found [here](https://github.com/kubernetes/autoscaler/releases)
+           Other versions of ``Autoscaler`` images can be found [here](https://github.com/kubernetes/autoscaler/releases).
 
 
-3. Modify the following highlighted sections of the ``deployment.yaml`` file (specifically inside the container section)
+3. Modify and add (where necessary) the following highlighted sections of the ``deployment.yaml`` file (specifically inside the container section)
    
-    ```yaml hl_lines="6-14 18"
+    ```yaml hl_lines="6-21"
     containers:
        - image: ${AUTOSCALER_IMAGE}
          name: cluster-autoscaler
@@ -58,16 +54,16 @@ graph LR
        volumes:
            - name: kubeconfig
              secret:
-                 secretName: <workload cluster name>-kubeconfig # (1)
+                 secretName: ${WORKLOAD_CLUSTER_NAME}-kubeconfig # (1)
                  items:
                      - key: value
                        path: kubeconfig.yml
     ```
 
-    1.  :man_raising_hand: Make sure to use the name of your workload cluster. Another easy way to find the secret name, to be used, is to run the command ``kubectl get secrets -n $TEST_NAMESPACE``.
+    1.  :material-fountain-pen-tip: Make sure to use the name/env. variable of your workload cluster. Another easy way to find the secret name, to be used, is to run the command ``kubectl get secrets -n $AUTOSCALER_NS``.
 
 
-4. Apply the Autoscaler deployment manifest
+4. Check the manifest to make sure you have included all details, and apply the ``Autoscaler`` deployment manifest
  
     ``` bash
     kubectl apply -f deployment.yaml 
@@ -76,11 +72,14 @@ graph LR
     Make sure the autoscaler pod is running 
  
     ``` { .bash .no-copy }
-    k get po -n kubevipns3    
+    k get po -n ${AUTOSCALER_NS}  
     #                                                                            
     NAME                                  READY   STATUS    RESTARTS   AGE
     cluster-autoscaler-6dbb469585-4ggtd   1/1     Running   0          7s
     ```
+   
+    !!!warning
+              Do not proceed if the ``Autoscaler`` pod has issues starting, troubleshoot and fix before moving on to the next section.
 
 We have prepared the Autoscaler resource to manage resources in our workload cluster.
 
@@ -114,7 +113,7 @@ To apply this capacity in the Autoscaler we need to set annotations in ``Machine
 Edit the ``MachineDeployment`` resource using the following command 
 
 ```bash
-kubectl edit MachineDeployment kubevip3-wmd -n ${TEST_NAMESPACE}
+kubectl edit MachineDeployment ${WORKLOAD_CLUSTER_NAME}-wmd -n ${AUTOSCALER_NS}
 ```
 Under the ``metadata`` section paste the following two lines:
 
@@ -122,6 +121,7 @@ Under the ``metadata`` section paste the following two lines:
 cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size: "5"
 cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: "1"
 ```
+
 Your MachineDeployment metadata section would look something like this 
 ``` { .yaml .no-copy} 
 apiVersion: cluster.x-k8s.io/v1beta1
@@ -135,11 +135,11 @@ metadata:
 1.  :material-transfer-up: Specifies maximum number of worker nodes to scale up to 
 2.  :material-transfer-down: Specifies minimum number of worker nodes 
 
-## Testing a Scale Up and Scale Down Event
+## Testing Scaling Events
 
 Now comes the fun part that we have been setting up for. 
 
-Let us deploy a test workload on our workload cluster.
+Let us deploy a test workload on our workload cluster and check if scaling events actually work.
 
 1. Apply the following workload manifest
    
@@ -147,7 +147,7 @@ Let us deploy a test workload on our workload cluster.
     k --kubeconfig kubevip3.cfg apply -f https://k8s.io/examples/application/php-apache.yaml
     ```
  
-    This will start one pod
+    This will start just one pod.
 
 2. Scale up this Deployment to 100 pods which will require more than one worker node worth of resources
    
@@ -155,32 +155,37 @@ Let us deploy a test workload on our workload cluster.
    k --kubeconfig kubevip3.cfg scale deployment php-apache --replicas 100
    ```
 
-3. Watch the AutoScaler ``PHASE``
+3. Watch the AutoScaler ``PHASE`` column in the output
     
-    ```bash
-    kubectl get MachineDeployment -A                                                                      
+    ```bash title="Sample output"
+    kubectl get MachineDeployment -A        
+
     NAMESPACE    NAME           CLUSTER    REPLICAS   READY   UPDATED   UNAVAILABLE   PHASE       AGE   VERSION
     kubevipns3   kubevip3-wmd   kubevip3   5          4       5         1             ScalingUp   22h   v1.24.11
     ```
-4.  Watch the AutoScaler logs by running the following command
 
-     ```bash
-     k logs <name of your AutoScaler pod> -n kubevipns3 -f # (1)
-     ```
+4.  Watch the AutoScaler logs by running the following command
      
-     1.  :material-fountain-pen-tip: Get the name of your pod using the command ``kubectl get pod -n -n $TEST_NAMESPACE``
- 
-    
-     ``` { .bash .no-copy }
-     k logs cluster-autoscaler-6dbb469585-4ggtd -n kubevipns3 -f 
-     I0413 09:32:53.208911       1 scale_up.go:472] Estimated 5 nodes needed in MachineDeployment/kubevipns3/kubevip3-wmd
-     I0413 09:32:53.406155       1 scale_up.go:595] Final scale-up plan: [{MachineDeployment/kubevipns3/kubevip3-wmd 1->5 (max: 5)}]
-     I0413 09:32:53.406215       1 scale_up.go:691] Scale-up: setting group MachineDeployment/kubevipns3/kubevip3-wmd size to 5
-     W0413 09:33:04.902674       1 clusterapi_controller.go:469] Machine "kubevip3-wmd-57fcdf9f7xbgz8z-kcx9h" has no providerID
-     W0413 09:33:04.902700       1 clusterapi_controller.go:469] Machine "kubevip3-wmd-57fcdf9f7xbgz8z-m88fl" has no providerID
-     W0413 09:33:04.902708       1 clusterapi_controller.go:469] Machine "kubevip3-wmd-57fcdf9f7xbgz8z-mlwb6" has no providerID
-     W0413 09:33:04.902713       1 clusterapi_controller.go:469] Machine "kubevip3-wmd-57fcdf9f7xbgz8z-rthbj" has no providerID                                                                                      
-     ```
+    === "Command Template"
+
+        ```bash
+        k logs <name of your AutoScaler pod> -n kubevipns3 -f # (1)
+        ```
+
+    === "Command Sample"
+
+        ``` { .bash .no-copy }
+        k logs cluster-autoscaler-6dbb469585-4ggtd -n kubevipns3 -f 
+        #
+        #
+        I0413 09:32:53.208911       1 scale_up.go:472] Estimated 5 nodes needed in MachineDeployment/kubevipns3/kubevip3-wmd
+        I0413 09:32:53.406155       1 scale_up.go:595] Final scale-up plan: [{MachineDeployment/kubevipns3/kubevip3-wmd 1->5 (max: 5)}]
+        I0413 09:32:53.406215       1 scale_up.go:691] Scale-up: setting group MachineDeployment/kubevipns3/kubevip3-wmd size to 5
+        W0413 09:33:04.902674       1 clusterapi_controller.go:469] Machine "kubevip3-wmd-57fcdf9f7xbgz8z-kcx9h" has no providerID
+        W0413 09:33:04.902700       1 clusterapi_controller.go:469] Machine "kubevip3-wmd-57fcdf9f7xbgz8z-m88fl" has no providerID
+        W0413 09:33:04.902708       1 clusterapi_controller.go:469] Machine "kubevip3-wmd-57fcdf9f7xbgz8z-mlwb6" has no providerID
+        W0413 09:33:04.902713       1 clusterapi_controller.go:469] Machine "kubevip3-wmd-57fcdf9f7xbgz8z-rthbj" has no providerID                                                                                      
+        ```
 
 5. You can also watch all the 100 pods now running using the following command
 
