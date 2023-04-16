@@ -152,8 +152,8 @@ Let us deploy a test workload on our workload cluster and check if scaling event
 2. Scale up this Deployment to 100 pods which will require more than one worker node worth of resources
    
     ```bash
-   k --kubeconfig kubevip3.cfg scale deployment php-apache --replicas 100
-   ```
+    k --kubeconfig kubevip3.cfg scale deployment php-apache --replicas 100
+    ```
 
 3. Watch the AutoScaler ``PHASE`` column in the output
     
@@ -217,3 +217,15 @@ Let us deploy a test workload on our workload cluster and check if scaling event
     kubevip3-wmd-57fcdf9f7xbgz8z-mlwb6   Ready    <none>          19m     v1.24.11
     kubevip3-wmd-57fcdf9f7xbgz8z-pqp8s   Ready    <none>          22h     v1.24.11
     ```
+
+7. Now we can test a scale down event to see if AutoScaler is communicating with Prism Central APIs to delete VMs that are not necessary
+
+    ```bash
+    k --kubeconfig kubevip3.cfg scale deployment php-apache --replicas 10
+    ```
+
+8. Watch the Node count, pods count, and Deployment logs as before.
+
+You have experienced one of your many serverless compute experience. 
+
+Do come back to this site check for more updates.

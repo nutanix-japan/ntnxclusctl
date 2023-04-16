@@ -93,9 +93,14 @@ plugins:
 #   - stylesheets/extra.css
 
 nav:
-    - 'Home': index.md
-    - 'Build VM Image': build_image.md
-    - 'Creating a Management Cluster': create_management_cluster.md
-    - 'Creating a Workload Cluster': create_workload_cluster.md
-    - 'Testing Autoscaling':  autoscaler_testing.md
-
+    - 'Home': 
+       - 'Overview': index.md
+       - 'Build VM Image': build_image.md
+       - 'Creating a Management Cluster': create_management_cluster.md
+       - 'Creating a Workload Cluster': create_workload_cluster.md
+       - 'Testing Autoscaling':  autoscaler_testing.md
+    - 'Appendix': 
+       - 'Creating Linux Tools VM': appendix/linux_tools_vm.md
+       - 'Helm': appendix/helm.md
+       - 'Using Public Container Registry Credentials': appendix/privatereg.md
+        
