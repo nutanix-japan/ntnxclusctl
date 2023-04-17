@@ -1,11 +1,37 @@
-# Landing Page
+# Introduction
 
+Welcome to the EXPERIMENTAL Serverless labs. This is not intended for PRODUCTION purposes.
 
-This is your home
+Most of the project works around Serverless capabilities that can be provided on Nutanix. (EXPERIMENTAL)
 
-The meaning of Serverless is evolving. 
+All the experimental features are inspired by Nutanix [Opendocs](opendocs.nutanix.com) documents.
 
+This repo/gitpages is just a way for us to gather and document all that we have tested and worked with. 
+
+# Our Preceived History of Serverless
+## Cloud Provider Controlled
+
+You would logon to a cloud provider console and input your function and cloud provider took care of running the funtion. The OS, the infrastructure required to run your code. 
+
+At the end of the billing period you got a bill for the amount of CPU and memory you used for a period of time.
+
+## Customer Controlled
+
+Customers are increasingly required to do more with less. Emergence of Kubernetes is allowing customers to gain control over cloud spending by automating resource consumption only when they are required. There is no requirement to have infrastructure running if no workloads are running. Automating launching required resources on-demand, scaling up and scaling them down makes sense for customers.
 ## Lab Flow
+
+This lab will introduce you the afore mentioned customer controlled serverless scenario. 
+
+All these steps are done on Nutanix hybrid cloud platform which can be installed on-premises and on a cloud provider of your choice (AWS and Azure for now).
+
+The flow works in the following manner:
+
+1. Using Hashicorp Packer tool you will create VM image for Kubernetes OS - this image will be uploaded to Prism Central 
+2. You will create a Management Kubernetes Cluster on your Laptop (Kind suggested here) - please feel free to use your installation tool and platform
+3. You will deploy a Workload Kubernetes Cluster from your Management Kubernetes Cluster
+4. You will configure Autoscaler capability on Management Kubernetes Cluster
+5. You will deploy a workload on the Workload Kubernetes cluster
+6. You will test Scaling events on the workload in the Workload Kubernets cluster
 
 ```mermaid
 stateDiagram
