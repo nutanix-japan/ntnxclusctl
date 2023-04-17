@@ -4,7 +4,7 @@ Welcome to the EXPERIMENTAL Serverless labs. This is not intended for PRODUCTION
 
 Most of the project works around Serverless capabilities that can be provided on Nutanix. (EXPERIMENTAL)
 
-All the experiments are inspired by Nutanix [Opendocs](https://opendocs.nutanix.com) documents.
+All the experiments are inspired content in  Nutanix [Opendocs](https://opendocs.nutanix.com) documents.
 
 This repo/gitpages is just a way for us to gather and document all that we have tested and worked with. 
 
