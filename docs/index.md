@@ -4,7 +4,7 @@ Welcome to the EXPERIMENTAL Serverless labs. This is not intended for PRODUCTION
 
 Most of the project works around Serverless capabilities that can be provided on Nutanix. (EXPERIMENTAL)
 
-All the experiments are inspired content in  Nutanix [Opendocs](https://opendocs.nutanix.com) documents.
+All the experiments are inspired by content in Nutanix [Opendocs](https://opendocs.nutanix.com) documents.
 
 This repo/gitpages is just a way for us to gather and document all that we have tested and worked with. 
 
@@ -18,6 +18,8 @@ At the end of the billing period you got a bill for the amount of CPU and memory
 ## Customer Controlled
 
 Customers are increasingly required to do more with less. Emergence of Kubernetes is allowing customers to gain control over cloud spending by automating resource consumption only when they are required. There is no requirement to have infrastructure running if no workloads are running. Automating launching required resources on-demand, scaling up and scaling them down makes sense for customers.
+
+This gives customer tight integration of infrastructure resources with their applications.
 ## Lab Flow
 
 This lab will introduce you the afore mentioned customer controlled serverless scenario. 

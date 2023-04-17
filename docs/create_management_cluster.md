@@ -2,6 +2,16 @@
 
 ## Workstation Setup
 
+```mermaid
+stateDiagram
+    direction LR
+    CreateManagementCluster --> CreateWorkloadCluster
+    state CreateManagementCluster {
+      direction LR
+      UseKind? --> WaitForUp
+    }
+```
+
 We will need a Kubernetes cluster setup on our workstation. This could be any of the following:
 
 - Kind

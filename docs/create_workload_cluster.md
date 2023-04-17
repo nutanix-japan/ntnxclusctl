@@ -1,12 +1,28 @@
-#Step by step for ClusterCtl
+# Creating a Workload Cluster
 
-## Purpose of ClusterCtl
+In this section we will create a Workload cluster. 
 
-## Workstation Setup
+This workload cluster will be deployed from the Mangement cluster that we created in the previous section.
 
-### Download 
+```mermaid
+stateDiagram
+    direction LR
+    CreateWorkloadCluster --> TestScalingEvents
+    state CreateWorkloadCluster {
+      direction LR
+      Success? --> GetKubeConfig
+    }
+```
 
-## Initialise
+1. Make sure your Kubernetes context is that of the your Management cluster.
+   
+    ```bash
+    export KUBECONFIG=${MGMT_KUBECONFIG_FILE}
+    ```
+    ```bash title="Run additional commands to make sure you are the Management cluster"
+    kubectl get nodes
+    kubectl get ns
+    ```
 
 4. Reserve a new Control Plane endpoint IP for your Kubernetes cluster.
    

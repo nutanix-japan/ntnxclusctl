@@ -1,13 +1,25 @@
 # Testing Autoscaling Functionality
 
+
 !!!warning
           As of April 2023, Autoscaling is a ``yet to be validated`` feature and it is ``not intended`` for production purposes.
 
           For updates follow this Nutanix [Opendocs](https://opendocs.nutanix.com/capx/v1.1.x/experimental/autoscaler/) document.
 
+## Section Flow
+
+```mermaid
+stateDiagram
+    direction LR
+    state TestScalingEvents {
+      direction LR
+      ScaleUp --> ScaleDown
+    }
+```
+
 We will run with the following configuration:
 
-1. The management cluster runs the Autoscaler 
+1. The Management cluster runs the Autoscaler 
 2. The worker nodes runs the workloads
 3. The Autoscaler on the management cluster monitors the resource requirements of the workloads in the workload cluster and scales up and scales in the worker nodes in the workload cluster
 

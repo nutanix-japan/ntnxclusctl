@@ -2,6 +2,16 @@
 
 In this section we will build a VM image using Hashicorp Packer Automation.
 
+```mermaid
+stateDiagram
+    direction LR
+    BuildVMImage --> CreateManagementCluster
+    state BuildVMImage{
+        direction LR
+        Sucessful? --> UploadtoPC
+    }
+```
+
 This image will be uploaded to Prism Central which will then be used by ``clusterctl`` utility to build VMs upon which Kubernetes will be deployed.
 
 Since the image needs quite a bit of packages to be installed it makes sense for this process to be automated. It is a good idea to have this image immutable so production workloads are not disturbed by OS or software upgrades. 
@@ -11,7 +21,6 @@ Packages include the following (not limited to):
 - Kubernetes binaries (version determined by logic in this ``image-builder/images/capi/hack/image-new-kube.py`` script -  you will download as you follow steps in this lab)
 - CSI drivers
 - Containerd binaries
-
 
 ## Steps to Building Image
 
