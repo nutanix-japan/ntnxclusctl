@@ -19,13 +19,13 @@ All the experiments are inspired by content in Nutanix [Opendocs](https://opendo
 This repository/Gitpages is just a way for us to gather and document all that we have tested and worked with and share with like-minded people.
 
 # Our Perceived Evolution of Serverless
-## Cloud Provider Controlled
+## Then - Cloud Provider Controlled
 
 You would logon to a cloud provider console and input your function and cloud provider took care of running the funtion. The OS, the infrastructure required to run your code. 
 
 At the end of the billing period you got a bill for the amount of CPU and memory you used for a period of time.
 
-## Customer Controlled
+## Now - Customer Controlled
 
 Customers are increasingly required to do more with less. Emergence of Kubernetes is allowing customers to gain control over cloud spending by automating resource consumption only when they are required. There is no requirement to have infrastructure running if no workloads are running. Automating launching required resources on-demand, scaling up and scaling them down makes sense for customers.
 
