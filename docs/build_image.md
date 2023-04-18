@@ -22,6 +22,9 @@ Packages include the following (not limited to):
 - CSI drivers
 - Containerd binaries
 
+## Step to Build a Workstation
+
+Follow the steps [here](appendix/linux_tools_vm.md) to build a workstation 
 ## Steps to Building Image
 
 !!!note
@@ -29,52 +32,72 @@ Packages include the following (not limited to):
 
 1. Login to your workstation 
    
-2. Ensure you have git installed
+1. Ensure you have git installed
    
     ```bash
-    yum install git
+    git version
     ```
    
-3. Clone this repository
+2. Clone this repository
     
     ```bash
     git clone https://github.com/kubernetes-sigs/image-builder.git
     ```
 
-4. Run the command to install Ansible and Packer
+3. Run the command to install Ansible and Packer
    
     ```bash 
     cd image-builder/images/capi/
     make deps-nutanix
     ```
 
-5. Change to the following directory and provide your Nutanix Prism Central information. This is where you will build and store the image
+4. Change to the following directory and provide your Nutanix Prism Central information. This is where you will build and store the image
    
     ```bash
     cd packer/nutanix/
     vi nutanix.json
     ```
+
+    === "Template file"
+
+        ```json
+        {
+         "force_deregister": "true",
+         "nutanix_cluster_name": "Name of PE Cluster",
+         "nutanix_endpoint": "Prism Central IP / FQDN",
+         "nutanix_insecure": "true",
+         "nutanix_password": "PrismCentral_Password",
+         "nutanix_port": "9440",
+         "nutanix_subnet_name": "Name of Subnet",
+         "nutanix_username": "PrismCentral_Username",
+         "scp_extra_vars": ""
+        }
+        ```
+    === "Sample file"
     
-    ```json
-    {
-     "force_deregister": "true",
-     "nutanix_cluster_name": "Name of PE Cluster",
-     "nutanix_endpoint": "Prism Central IP / FQDN",
-     "nutanix_insecure": "true",
-     "nutanix_password": "PrismCentral_Password",
-     "nutanix_port": "9440",
-     "nutanix_subnet_name": "Name of Subnet",
-     "nutanix_username": "PrismCentral_Username",
-     "scp_extra_vars": ""
-    }
-    ```
-6. Once this file is saved with your Nutanix cluster specific information. Run the following command to intialise and build the image.
+        ```json
+        {
+         "force_deregister": "true",
+         "nutanix_cluster_name": "pe.example.com",
+         "nutanix_endpoint": "pc.example.com",
+         "nutanix_insecure": "true",
+         "nutanix_password": "XXXXXX",
+         "nutanix_port": "9440",
+         "nutanix_subnet_name": "MY-PE-SUBNET-VLAN-0",
+         "nutanix_username": "admin",
+         "scp_extra_vars": ""
+        }
+        ```
+
+5. Once this file is saved with your Nutanix cluster specific information. Run the following command to intialise and build the ``ubuntu-2204`` image.
    
     ```bash
     make build-nutanix-ubuntu-2204
     ```
     !!!tip
            You can also logon to Prism Central UI to check the **Tasks** to see the Image build activities.
+
+           Feel free to build other OS images as well and use them as OS in your kubernetes clusters. 
 
     ```bash title="Command output - This will take about 13 minutes"
     < output snipped　>

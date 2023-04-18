@@ -22,6 +22,13 @@ During testing on a Intel Macbook pro with 8 CPU and 16 CPU, we found out that `
 
 Please feel free to choose what you are familiar with and have proven sucess with.
 
+!!!warning
+          We have noticed the following issues when we were running kubernetes clusters on local Mac/Windows
+
+          - Pods on ``kube-system`` namespace may take about 10 minutes to download
+          - Pods may take about 5 minutes to become ``Ready`` state
+          - Make sure the management cluster is fully functional before proceeding to creating workload cluster
+
 ## Create Management Cluster
 
 Follow steps here to [create](https://kind.sigs.k8s.io/) a ``kind`` mangement cluster 

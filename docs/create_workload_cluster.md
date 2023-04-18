@@ -120,3 +120,11 @@ stateDiagram
      mycluster-wmd-57fcdf9f7xbgz8z-pq47m   Ready    <none>          9m24s   v1.24.11
      mycluster-wmd-57fcdf9f7xbgz8z-pqp8s   Ready    <none>          9m26s   v1.24.11
      ```
+
+16. If you have any issues or wanting to delete any workload cluster you can use the following commands
+    
+    To delete a workload cluster
+ 
+    ```bash
+    kubectl delete cluster ${WORKLOAD_CLUSTER_NAME} -n ${AUTOSCALER_NS}
+    ```
