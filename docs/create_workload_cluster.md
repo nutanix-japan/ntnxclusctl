@@ -88,7 +88,7 @@ stateDiagram
 12. Once the desired number of nodes are present, you will see that these will be in a ``NotReady`` state. 
     
      ```bash
-     k --kubeconfig mycluster.cfg get nodes                                              ─╯
+     k --kubeconfig mycluster.cfg get nodes                                              
      NAME                                 STATUS     ROLES           AGE     VERSION
      mycluster-kcp-jnhf5                   NotReady   control-plane   4m43s   v1.24.11
      mycluster-kcp-p56j9                   NotReady   control-plane   6m19s   v1.24.11

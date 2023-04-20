@@ -33,6 +33,16 @@ Please feel free to choose what you are familiar with and have proven sucess wit
 
 Follow steps here to [create](https://kind.sigs.k8s.io/) a ``kind`` mangement cluster 
 
+## Install clusterctl 
+
+Follow procedure [here](https://cluster-api.sigs.k8s.io/user/quick-start.html) to install ``clusterctl`` tool 
+
+A typical linux install command would like this, but do refer the link above for the latest command and your installation platform. 
+
+```bash title="Installation for AMD64 Platform"
+curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v1.4.1/clusterctl-linux-amd64 -o clusterctl
+```
+
 ## Initialise Management Cluster 
 
 1. Create the following file in your workstation 
@@ -52,14 +62,14 @@ Follow steps here to [create](https://kind.sigs.k8s.io/) a ``kind`` mangement cl
     EXP_MACHINE_POOL: "true"          # Experimental
     CLUSTER_TOPOLOGY: "true"          # Experimental
     
-    KUBERNETES_VERSION: "v1.24.7"
+    KUBERNETES_VERSION: "v1.24.7"     # use the kubernetes version from the image build information
     WORKER_MACHINE_COUNT: 3
     NUTANIX_MACHINE_VCPU_SOCKET: 4
     NUTANIX_MACHINE_MEMORY_SIZE: "8Gi"
-    NUTANIX_SSH_AUTHORIZED_KEY: ""
+    NUTANIX_SSH_AUTHORIZED_KEY: "ssh-rsa AAAAB3...."
     
     NUTANIX_PRISM_ELEMENT_CLUSTER_NAME: ""
-    NUTANIX_MACHINE_TEMPLATE_IMAGE_NAME: "ubuntu-2204-kube-v1.24.11"
+    NUTANIX_MACHINE_TEMPLATE_IMAGE_NAME: "xxxxxx"    # use your image name from the previous section
     NUTANIX_SUBNET_NAME: "Primary"
     ```
 

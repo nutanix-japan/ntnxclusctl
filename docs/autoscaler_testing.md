@@ -156,7 +156,7 @@ Let us deploy a test workload on our workload cluster and check if scaling event
 1. Apply the following workload manifest
    
     ```bash
-    k --kubeconfig kubevip3.cfg apply -f https://k8s.io/examples/application/php-apache.yaml
+    k --kubeconfig ${WORKLOAD_CLUSTER_NAME}.cfg apply -f https://k8s.io/examples/application/php-apache.yaml
     ```
  
     This will start just one pod.
@@ -164,16 +164,17 @@ Let us deploy a test workload on our workload cluster and check if scaling event
 2. Scale up this Deployment to 100 pods which will require more than one worker node worth of resources
    
     ```bash
-    k --kubeconfig kubevip3.cfg scale deployment php-apache --replicas 100
+    k --kubeconfig ${WORKLOAD_CLUSTER_NAME}.cfg scale deployment php-apache --replicas 100
     ```
 
 3. Watch the AutoScaler ``PHASE`` column in the output
     
     ```bash title="Sample output"
     kubectl get MachineDeployment -A        
-
-    NAMESPACE    NAME           CLUSTER    REPLICAS   READY   UPDATED   UNAVAILABLE   PHASE       AGE   VERSION
-    kubevipns3   kubevip3-wmd   kubevip3   5          4       5         1             ScalingUp   22h   v1.24.11
+    ```
+    ```{ .bash .no-copy }
+    NAMESPACE           NAME           CLUSTER    REPLICAS   READY   UPDATED   UNAVAILABLE   PHASE       AGE   VERSION
+    ${AUTOSCALER_NS}    kubevip3-wmd   kubevip3   5          4       5         1             ScalingUp   22h   v1.24.11
     ```
 
 4.  Watch the AutoScaler logs by running the following command
@@ -181,18 +182,18 @@ Let us deploy a test workload on our workload cluster and check if scaling event
     === "Command Template"
 
         ```bash
-        k logs <name of your AutoScaler pod> -n kubevipns3 -f # (1)
+        k logs <name of your AutoScaler pod> -n ${AUTOSCALER_NS}  -f # (1)
         ```
 
     === "Command Sample"
 
-        ``` { .bash .no-copy }
-        k logs cluster-autoscaler-6dbb469585-4ggtd -n kubevipns3 -f 
+        ``` { .text .no-copy }
+        k logs cluster-autoscaler-6dbb469585-4ggtd -n ${AUTOSCALER_NS}  -f 
         #
         #
-        I0413 09:32:53.208911       1 scale_up.go:472] Estimated 5 nodes needed in MachineDeployment/kubevipns3/kubevip3-wmd
-        I0413 09:32:53.406155       1 scale_up.go:595] Final scale-up plan: [{MachineDeployment/kubevipns3/kubevip3-wmd 1->5 (max: 5)}]
-        I0413 09:32:53.406215       1 scale_up.go:691] Scale-up: setting group MachineDeployment/kubevipns3/kubevip3-wmd size to 5
+        I0413 09:32:53.208911       1 scale_up.go:472] Estimated 5 nodes needed in MachineDeployment/kubevip3ns /kubevip3-wmd
+        I0413 09:32:53.406155       1 scale_up.go:595] Final scale-up plan: [{MachineDeployment/kubevip3ns /kubevip3-wmd 1->5 (max: 5)}]
+        I0413 09:32:53.406215       1 scale_up.go:691] Scale-up: setting group MachineDeployment/$kubevip3ns /kubevip3-wmd size to 5
         W0413 09:33:04.902674       1 clusterapi_controller.go:469] Machine "kubevip3-wmd-57fcdf9f7xbgz8z-kcx9h" has no providerID
         W0413 09:33:04.902700       1 clusterapi_controller.go:469] Machine "kubevip3-wmd-57fcdf9f7xbgz8z-m88fl" has no providerID
         W0413 09:33:04.902708       1 clusterapi_controller.go:469] Machine "kubevip3-wmd-57fcdf9f7xbgz8z-mlwb6" has no providerID
@@ -202,9 +203,9 @@ Let us deploy a test workload on our workload cluster and check if scaling event
 5. You can also watch all the 100 pods now running using the following command
 
      ``` { .bash .no-copy }
-     k --kubeconfig kubevip3.cfg get pods       
-     #
-     #                                                           ─
+     k --kubeconfig ${WORKLOAD_CLUSTER_NAME}.cfg get pods       
+     ```
+     ``` { .text .no-copy }                                                      
      NAME                          READY   STATUS             RESTARTS   AGE
      php-apache-698db99f59-24mqp   1/1     Running            0          17m
      php-apache-698db99f59-2pcpz   1/1     Running            0          17m
@@ -218,7 +219,7 @@ Let us deploy a test workload on our workload cluster and check if scaling event
 6. Let us check the number of nodes in the workload cluster and see that it has been scaled up to 5 
     
     ``` { .bash .no-copy }
-    k --kubeconfig kubevip3.cfg get nodes                                                                 
+    k --kubeconfig ${WORKLOAD_CLUSTER_NAME}.cfg get nodes                                                                 
     NAME                                 STATUS   ROLES           AGE     VERSION
     kubevip3-kcp-jnhf5                   Ready    control-plane   22h     v1.24.11
     kubevip3-kcp-p56j9                   Ready    control-plane   22h     v1.24.11
@@ -233,7 +234,7 @@ Let us deploy a test workload on our workload cluster and check if scaling event
 7. Now we can test a scale down event to see if AutoScaler is communicating with Prism Central APIs to delete VMs that are not necessary
 
     ```bash
-    k --kubeconfig kubevip3.cfg scale deployment php-apache --replicas 10
+    k --kubeconfig ${WORKLOAD_CLUSTER_NAME}.cfg scale deployment php-apache --replicas 10
     ```
 
 8. Watch the Node count, pods count, and Deployment logs as before.
