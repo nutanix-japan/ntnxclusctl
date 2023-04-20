@@ -30,13 +30,29 @@ graph LR
 
 ## Deploy AutoScaler on Management Cluster
 
+1. Make sure your Kubernetes context is that of the your Management cluster.
+   
+    ```bash
+    export KUBECONFIG=${MGMT_KUBECONFIG_FILE}
+    ```
+    ```bash title="Run additional commands to make sure you are the Management cluster"
+    kubectl get nodes
+    kubectl get ns
+    ```
+
 1. Download the AutoScaler manifest
    
     ```bash
     curl -OL https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/clusterapi/examples/deployment.yaml
     ```
 
-2. Set your environment variables for the Autoscaler image you would like to use 
+2. Replace the environment variable in the dowloaded one to suit our workload cluster namespace environemnt variabele ${WORKLOAD_CLUSTER_NS}
+
+    ```bash
+    sed -i 's/${AUTOSCALER_NS}/${WORKLOAD_CLUSTER_NS}/g' deployment.yaml
+    ```
+
+3. Set your environment variables for the Autoscaler image you would like to use 
    
     ```bash
     export AUTOSCALER_IMAGE="us.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler:v1.24.1"
@@ -84,7 +100,7 @@ graph LR
     Make sure the autoscaler pod is running 
  
     ``` { .bash .no-copy }
-    k get po -n ${AUTOSCALER_NS}  
+    k get po -n ${WORKLOAD_CLUSTER_NS}  
     #                                                                            
     NAME                                  READY   STATUS    RESTARTS   AGE
     cluster-autoscaler-6dbb469585-4ggtd   1/1     Running   0          7s
@@ -125,7 +141,7 @@ To apply this capacity in the Autoscaler we need to set annotations in ``Machine
 Edit the ``MachineDeployment`` resource using the following command 
 
 ```bash
-kubectl edit MachineDeployment ${WORKLOAD_CLUSTER_NAME}-wmd -n ${AUTOSCALER_NS}
+kubectl edit MachineDeployment ${WORKLOAD_CLUSTER_NAME}-wmd -n ${WORKLOAD_CLUSTER_NS}
 ```
 Under the ``metadata`` section paste the following two lines:
 
@@ -173,8 +189,8 @@ Let us deploy a test workload on our workload cluster and check if scaling event
     kubectl get MachineDeployment -A        
     ```
     ```{ .bash .no-copy }
-    NAMESPACE           NAME           CLUSTER    REPLICAS   READY   UPDATED   UNAVAILABLE   PHASE       AGE   VERSION
-    ${AUTOSCALER_NS}    kubevip3-wmd   kubevip3   5          4       5         1             ScalingUp   22h   v1.24.11
+    NAMESPACE                 NAME           CLUSTER    REPLICAS   READY   UPDATED   UNAVAILABLE   PHASE       AGE   VERSION
+    ${WORKLOAD_CLUSTER_NS}    kubevip3-wmd   kubevip3   5          4       5         1             ScalingUp   22h   v1.24.11
     ```
 
 4.  Watch the AutoScaler logs by running the following command
@@ -182,13 +198,13 @@ Let us deploy a test workload on our workload cluster and check if scaling event
     === "Command Template"
 
         ```bash
-        k logs <name of your AutoScaler pod> -n ${AUTOSCALER_NS}  -f # (1)
+        k logs <name of your AutoScaler pod> -n ${WORKLOAD_CLUSTER_NS}  -f # (1)
         ```
 
     === "Command Sample"
 
         ``` { .text .no-copy }
-        k logs cluster-autoscaler-6dbb469585-4ggtd -n ${AUTOSCALER_NS}  -f 
+        k logs cluster-autoscaler-6dbb469585-4ggtd -n ${WORKLOAD_CLUSTER_NS}  -f 
         #
         #
         I0413 09:32:53.208911       1 scale_up.go:472] Estimated 5 nodes needed in MachineDeployment/kubevip3ns /kubevip3-wmd

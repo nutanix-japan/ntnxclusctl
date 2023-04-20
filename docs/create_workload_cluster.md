@@ -28,7 +28,7 @@ stateDiagram
    
     ```bash
     export WORKLOAD_CLUSTER_NAME=mycluster
-    export AUTOSCALER_NS=mynamespace
+    export WORKLOAD_CLUSTER_NS=mynamespace
     ```
 
 5. Generate your kubernetes clusters configuration file
@@ -36,7 +36,7 @@ stateDiagram
     ```bash
     CONTROL_PLANE_ENDPOINT_IP=x.x.x.x clusterctl generate cluster ${WORKLOAD_CLUSTER_NAME} --flavor ccm \
     -i nutanix \
-    --target-namespace ${AUTOSCALER_NS}  \
+    --target-namespace ${WORKLOAD_CLUSTER_NS}  \
     --kubernetes-version v1.24.11 \
     --control-plane-machine-count 1 \
     --worker-machine-count 3 > ./cluster.yaml
@@ -45,7 +45,7 @@ stateDiagram
 7. Create a namespace in the management cluster where the workload cluster can be managed
 
     ```bash
-    kubectl create ns ${AUTOSCALER_NS}
+    kubectl create ns ${WORKLOAD_CLUSTER_NS}
     ```
 
 8.  Apply the ``cluster.yaml`` manifest to create your workload cluster in the Nutanix infrastructure
@@ -75,7 +75,7 @@ stateDiagram
 10. Download the kubeconfig for workload cluster by running the following command
     
     ```bash
-    clusterctl get kubeconfig ${WORKLOAD_CLUSTER_NAME} -n ${AUTOSCALER_NS} > ${WORKLOAD_CLUSTER_NAME}.kubeconfig
+    clusterctl get kubeconfig ${WORKLOAD_CLUSTER_NAME} -n ${WORKLOAD_CLUSTER_NS} > ${WORKLOAD_CLUSTER_NAME}.kubeconfig
     kubectl --kubeconfig ./${WORKLOAD_CLUSTER_NAME}.kubeconfig get nodes
     ``` 
 
@@ -126,5 +126,5 @@ stateDiagram
     To delete a workload cluster
  
     ```bash
-    kubectl delete cluster ${WORKLOAD_CLUSTER_NAME} -n ${AUTOSCALER_NS}
+    kubectl delete cluster ${WORKLOAD_CLUSTER_NAME} -n ${WORKLOAD_CLUSTER_NS}
     ```
